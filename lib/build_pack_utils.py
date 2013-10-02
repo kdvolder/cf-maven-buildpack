@@ -245,19 +245,23 @@ class CloudFoundryUtil(object):
         if not os.path.exists(self.CACHE_DIR):
             os.makedirs(self.CACHE_DIR)
 
+    def load_json_config_file_from(self, folder, cfgFile):
+        return self.load_json_config_file(os.path.join(folder, cfgFile))
+
     def load_json_config_file(self, cfgPath):
-        with open(cfgPath, 'rt') as cfgFile:
-            return json.load(cfgFile)
+        if os.path.exists(cfgPath):
+            with open(cfgPath, 'rt') as cfgFile:
+                return json.load(cfgFile)
 
 
 class CloudFoundryInstaller(object):
-    def __init__(self, cfgFile):
-        self._cf = CloudFoundryUtil()
-        self._cfg = self._cf.load_json_config_file(cfgFile)
-        self._unzipUtil = UnzipUtil(self._cfg)
-        self._hashUtil = HashUtil(self._cfg)
-        self._dcm = DirectoryCacheManager(self._cfg)
-        self._dwn = Downloader(self._cfg)
+    def __init__(self, cf, cfg):
+        self._cf = cf
+        self._cfg = cfg
+        self._unzipUtil = UnzipUtil(cfg)
+        self._hashUtil = HashUtil(cfg)
+        self._dcm = DirectoryCacheManager(cfg)
+        self._dwn = Downloader(cfg)
 
     @staticmethod
     def _safe_makedirs(path):
@@ -268,7 +272,9 @@ class CloudFoundryInstaller(object):
             if e.errno != 17:
                 raise e
 
-    def install_binary(self, fromKey, fileName, digest):
+    def install_binary(self, installKey):
+        fileName = self._cfg['%s_PACKAGE' % installKey]
+        digest = self._cfg['%s_PACKAGE_HASH' % installKey]
         # check cache & compare digest
         # use cached file or download new
         # download based on cfg settings
@@ -276,7 +282,7 @@ class CloudFoundryInstaller(object):
         if fileToInstall is None:
             fileToInstall = os.path.join(self._cf.CACHE_DIR, fileName)
             self._dwn.download(
-                os.path.join(self._cfg['%s_DOWNLOAD_PREFIX' % fromKey],
+                os.path.join(self._cfg['%s_DOWNLOAD_PREFIX' % installKey],
                              fileName),
                 fileToInstall)
             digest = self._hashUtil.calculate_hash(fileToInstall)
@@ -284,13 +290,15 @@ class CloudFoundryInstaller(object):
         # unzip
         # install to cfg determined location 'PACKAGE_INSTALL_DIR'
         #  into or CF's BUILD_DIR
-        if 'PACKAGE_INSTALL_DIR' in self._cfg.keys():
-            installIntoDir = os.path.join(self._cfg['PACKAGE_INSTALL_DIR'],
+        pkgKey = '%s_PACKAGE_INSTALL_DIR' % installKey
+        if pkgKey in self._cfg.keys():
+            installIntoDir = os.path.join(self._cfg[pkgKey],
                                           fileName.split('.')[0])
         else:
             installIntoDir = os.path.join(self._cf.BUILD_DIR,
                                           fileName.split('.')[0])
         self._unzipUtil.extract(fileToInstall, installIntoDir)
+        return installIntoDir
 
     def install_from_build_pack(self, bpFile, toLocation=None):
         """Copy file from the build pack to the droplet
@@ -323,3 +331,20 @@ class CloudFoundryInstaller(object):
         fullPathTo = os.path.join(self._cf.BUILD_DIR, toLocation)
         self._safe_makedirs(os.path.dirname(fullPathTo))
         shutil.copy(fullPathFrom, fullPathTo)
+
+
+class CloudFoundryRunner(object):
+    @staticmethod
+    def run_from_directory(folder, command, args, shell=False):
+        if os.path.exists(folder):
+            cwd = os.getcwd()
+            try:
+                os.chdir(folder)
+                cmd = [command,]
+                cmd.extend(args)
+                proc = Popen(cmd, stdout=PIPE, stderr=PIPE, shell=shell)
+                stdout, stderr = proc.communicate()
+                retcode = proc.poll()
+                return (retcode, stdout, stderr)
+            finally:
+                os.chdir(cwd)
