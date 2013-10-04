@@ -7,4 +7,4 @@
 #  python scripts, like install Python.
 BP=$(dirname $(dirname $0))
 export PYTHONPATH=$BP/lib
-python $BP/scripts/compile.py
+python $BP/scripts/compile.py $1 $2
