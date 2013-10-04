@@ -14,6 +14,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from build_pack_utils import Builder
+
+
+def maven_command(cfg):
+    return cfg.get('MAVEN_BUILD_COMMAND', './bin/mvn package').split(' ')
+
 
 def log_run_error(cmd, retcode, stdout, stderr):
     print 'Comand [%s] failed with [%d]' % (' '.join(cmd), retcode)
@@ -21,11 +27,11 @@ def log_run_error(cmd, retcode, stdout, stderr):
     print stdout
     print 'STDERR:'
     print stderr
-    raise BuilderExit()
+    raise RuntimeError('Script Failure')
 
 
 if __name__ == '__main__':
-    Builder()
+    (Builder()
         .configure()
             .default_config()
             .user_config()
@@ -35,10 +41,10 @@ if __name__ == '__main__':
             .package('MAVEN')
             .done()
         .run()
-            .command(cfg.get('MAVEN_BUILD_COMMAND', './bin/mvn package'))
+            .command(maven_command)
             .out_of('MAVEN_INSTALL_PATH')
             .with_shell()
-            .on_fail(log_run_err)
+            .on_fail(log_run_error)
             .done()
         .create_start_script()
             .environment_variable()
@@ -52,5 +58,4 @@ if __name__ == '__main__':
             .command()
                 .run('mvn')
                 .with_argument('tomcat:run')
-            .write()
-
+            .write())

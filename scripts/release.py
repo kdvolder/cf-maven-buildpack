@@ -16,6 +16,10 @@
 # limitations under the License.
 
 from build_pack_utils import CloudFoundryUtil
+from build_pack_utils import Configurer
 
 cf = CloudFoundryUtil()
+cfg = Configurer({'cfg': {}}).default_config().user_config().builder.cfg
 
+print 'default_process_types:'
+print '  web: %s' % cfg.get('START_SCRIPT_NAME', 'start.sh')
