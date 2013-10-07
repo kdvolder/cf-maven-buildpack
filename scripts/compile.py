@@ -21,7 +21,7 @@ def maven_command(cfg):
     return cfg.get('MAVEN_BUILD_COMMAND', './bin/mvn package').split(' ')
 
 
-def log_run_error(cmd, retcode, stderr):
+def log_run(cmd, retcode, stdout, stderr):
     print 'Comand [%s] failed with [%d]' % (' '.join(cmd), retcode)
     print 'STDOUT:'
     print stdout
@@ -44,7 +44,7 @@ if __name__ == '__main__':
             .command(maven_command)
             .out_of('MAVEN_INSTALL_PATH')
             .with_shell()
-            .on_fail(log_run_error)
+            .on_finish(log_run)
             .done()
         .create_start_script()
             .environment_variable()
