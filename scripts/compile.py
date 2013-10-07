@@ -42,7 +42,7 @@ if __name__ == '__main__':
             .done()
         .run()
             .command(maven_command)
-            .environment_variables()
+            .environment_variable()
                 .name('JAVA_HOME')
                 .value('JAVA_INSTALL_PATH')
             .out_of('MAVEN_INSTALL_PATH')
