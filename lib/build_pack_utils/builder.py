@@ -60,13 +60,14 @@ class Runner(object):
         self._on_finish = None
         self._on_success = None
         self._on_fail = None
+        self._env = os.environ.copy()
 
     def done(self):
         if os.path.exists(self._path):
             cwd = os.getcwd()
             try:
                 os.chdir(self._path)
-                proc = Popen(self._cmd, stdout=PIPE,
+                proc = Popen(self._cmd, stdout=PIPE, env=self._env,
                              stderr=PIPE, shell=self._shell)
                 stdout, stderr = proc.communicate()
                 retcode = proc.poll()
@@ -80,6 +81,9 @@ class Runner(object):
             finally:
                 os.chdir(cwd)
         return self._builder
+
+    def environment_variable(self):
+        return EnvironmentVariableBuilder(self)
 
     def command(self, command, shell=True):
         if hasattr(command, '__call__'):
@@ -117,6 +121,28 @@ class Runner(object):
         if hasattr(on_finish, '__call__'):
             self._on_finish = on_finish
         return self
+
+
+class RunnerEnvironmentVariableBuilder(object):
+    def __init__(self, runner):
+        self._runner = runner
+        self._name = None
+
+    def name(self, name):
+        self._name = name
+        return self
+
+    def value(self, value):
+        if not self._name:
+            raise ValueError('You must specify a name')
+        builder = self._scriptBuilder.builder
+        if hasattr(value, '__call__'):
+            value = value()
+        elif value in builder._ctx.keys():
+            value = builder._ctx[value]
+        line = []
+        self._runner._env[self._name] = value
+        return self._runner
 
 
 class Executor(object):
