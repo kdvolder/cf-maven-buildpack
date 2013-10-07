@@ -21,7 +21,7 @@ def maven_command(cfg):
     return cfg.get('MAVEN_BUILD_COMMAND', './bin/mvn package').split(' ')
 
 
-def log_run_error(cmd, retcode, stdout, stderr):
+def log_run_error(cmd, retcode, stderr):
     print 'Comand [%s] failed with [%d]' % (' '.join(cmd), retcode)
     print 'STDOUT:'
     print stdout
