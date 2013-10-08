@@ -21,11 +21,11 @@ from build_pack_utils import Builder
 def maven_command(cfg):
     mvnCmd = cfg.get('MAVEN_BUILD_COMMAND', 'package')
     mvn = os.path.join(cfg['MAVEN_INSTALL_PATH'], 'bin', 'mvn')
-    return [mvn, mvnCmd]
+    return [mvn, '-X', mvnCmd]
 
 
 def log_run(cmd, retcode, stdout, stderr):
-    print 'Comand [%s] failed with [%d]' % (' '.join(cmd), retcode)
+    print 'Comand [%s] failed with [%d]' % (str(cmd), retcode)
     print 'STDOUT:'
     print stdout
     print 'STDERR:'
