@@ -26,14 +26,13 @@ def maven_command(cfg):
 
 
 def log_run(cmd, retcode, stdout, stderr):
-    print 'Current Directory: [%s]' % os.getcwd()
-    print '\n\t'.join(os.listdir(os.getcwd()))
-    print 'Comand [%s] failed with [%d]' % (str(cmd), retcode)
+    print 'Comand [%s] completed with [%d]' % (str(cmd), retcode)
     print 'STDOUT:'
     print stdout
     print 'STDERR:'
     print stderr
-    raise RuntimeError('Script Failure')
+    if retcode != 0:
+        raise RuntimeError('Script Failure')
 
 
 if __name__ == '__main__':
