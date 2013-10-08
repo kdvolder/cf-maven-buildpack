@@ -24,4 +24,4 @@ ctx = (Builder()
                .user_config()).builder._ctx
 
 print 'default_process_types:'
-print '  web: %s' % ctx.get('START_SCRIPT_NAME', 'start.sh')
+print '  web: %s' % ctx.get('START_SCRIPT_NAME', '$HOME/start.sh')
