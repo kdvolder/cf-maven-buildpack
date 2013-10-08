@@ -52,7 +52,7 @@ if __name__ == '__main__':
             .done()
         .run()
             .command('ls -la')
-            .out_of('BUILD_DIR')
+            .out_of('CACHE_DIR')
             .on_finish(log_run)
             .done()
         .run()
