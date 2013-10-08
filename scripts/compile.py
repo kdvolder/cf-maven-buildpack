@@ -31,7 +31,7 @@ def copy_maven_repo_to_droplet(cfg):
 
 
 def log_run(cmd, retcode, stdout, stderr):
-    print 'Comand [%s] completed with [%d]' % (str(cmd), retcode)
+    print 'Comand %s completed with [%d]' % (str(cmd), retcode)
     print 'STDOUT:'
     print stdout
     print 'STDERR:'
@@ -39,6 +39,14 @@ def log_run(cmd, retcode, stdout, stderr):
     if retcode != 0:
         raise RuntimeError('Script Failure')
 
+
+def log_ignore_failures(cmd, retcode, stdout, stderr):
+    print 'Comand %s completed with [%d]' % (str(cmd), retcode)
+    print 'STDOUT:'
+    print stdout
+    print 'STDERR:'
+    print stderr
+    
 
 if __name__ == '__main__':
     (Builder()
@@ -58,7 +66,7 @@ if __name__ == '__main__':
         .run()
             .command('tar zxf repo.tar.gz')
             .out_of('CACHE_DIR')
-            .on_finish(log_run)
+            .on_finish(log_ignore_failures)
             .done()
         .run()
             .command('ls -la')
