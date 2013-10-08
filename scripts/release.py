@@ -15,11 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from build_pack_utils import CloudFoundryUtil
+from build_pack_utils import Builder
 from build_pack_utils import Configurer
 
-cf = CloudFoundryUtil()
-cfg = Configurer({'cfg': {}}).default_config().user_config().builder.cfg
+ctx = (Builder()
+           .configure()
+               .default_config()
+               .user_config()).builder._ctx
 
 print 'default_process_types:'
-print '  web: %s' % cfg.get('START_SCRIPT_NAME', 'start.sh')
+print '  web: %s' % ctx.get('START_SCRIPT_NAME', 'start.sh')

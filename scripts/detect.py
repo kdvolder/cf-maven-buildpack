@@ -17,10 +17,15 @@
 
 import sys
 import os.path
-from build_pack_utils import CloudFoundryUtil
+from build_pack_utils import Builder
+from build_pack_utils import Configurer
 
-cf = CloudFoundryUtil()
-if cf.BUILD_DIR and os.path.exists(os.path.join(cf.BUILD_DIR, 'pom.xml')):
+ctx = (Builder()
+           .configure()
+               .default_config()
+               .user_config()).builder._ctx
+
+if ctx['BUILD_DIR'] and os.path.exists(os.path.join(ctx['BUILD_DIR'], 'pom.xml')):
     print 'Maven'
     sys.exit(0)
 
