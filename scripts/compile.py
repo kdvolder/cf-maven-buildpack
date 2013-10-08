@@ -20,7 +20,7 @@ from build_pack_utils import Builder
 
 def maven_command(cfg):
     mvnCmd = cfg.get('MAVEN_BUILD_COMMAND', 'package')
-    mvn = os.path.join(cfg['BUILD_DIR'], 'bin', 'mvn')
+    mvn = os.path.join(cfg['MAVEN_INSTALL_PATH'], 'bin', 'mvn')
     return [mvn, mvnCmd]
 
 
