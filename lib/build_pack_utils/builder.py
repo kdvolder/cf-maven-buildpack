@@ -83,9 +83,9 @@ class Runner(object):
         return self._builder
 
     def environment_variable(self):
-        return EnvironmentVariableBuilder(self)
+        return RunnerEnvironmentVariableBuilder(self)
 
-    def command(self, command, shell=True):
+    def command(self, command):
         if hasattr(command, '__call__'):
             self._cmd = command(self._builder._ctx)
         elif hasattr(command, 'split'):
@@ -135,12 +135,10 @@ class RunnerEnvironmentVariableBuilder(object):
     def value(self, value):
         if not self._name:
             raise ValueError('You must specify a name')
-        builder = self._scriptBuilder.builder
         if hasattr(value, '__call__'):
             value = value()
-        elif value in builder._ctx.keys():
-            value = builder._ctx[value]
-        line = []
+        elif value in self._runner._builder._ctx.keys():
+            value = self._runner._builder._ctx[value]
         self._runner._env[self._name] = value
         return self._runner
 
