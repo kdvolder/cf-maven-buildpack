@@ -66,4 +66,5 @@ if __name__ == '__main__':
             .command()
                 .run('mvn')
                 .with_argument('tomcat:run')
+                .done()
             .write())
