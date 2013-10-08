@@ -21,8 +21,14 @@ from build_pack_utils import Builder
 def maven_command(cfg):
     mvnCmd = cfg.get('MAVEN_BUILD_COMMAND', 'package')
     mvn = os.path.join(cfg['MAVEN_INSTALL_PATH'], 'bin', 'mvn')
+    mvnRepo = os.path.join(cfg['CACHE_DIR'], 'maven')
+    cfg['MAVEN_LOCAL_REPO'] = mvnRepo
     pom = os.path.join(cfg['BUILD_DIR'], 'pom.xml')
-    return [mvn, '-f', pom, mvnCmd]
+    return [mvn, '-Dmaven.repo.local=%s' % mvnRepo, '-f', pom, mvnCmd]
+
+
+def copy_maven_repo_to_droplet(cfg):
+    return ['cp', '-R', cfg['MAVEN_LOCAL_REPO'], '.']
 
 
 def log_run(cmd, retcode, stdout, stderr):
@@ -53,6 +59,10 @@ if __name__ == '__main__':
             .out_of('BUILD_DIR')
             .with_shell()
             .on_finish(log_run)
+            .done()
+        .run()
+            .command(copy_maven_repo_to_droplet)
+            .out_of('BUILD_DIR')
             .done()
         .create_start_script()
             .environment_variable()
