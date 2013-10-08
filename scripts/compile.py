@@ -48,6 +48,7 @@ if __name__ == '__main__':
             .environment_variable()
                 .name('JAVA_HOME')
                 .value('JAVA_INSTALL_PATH')
+            .out_of('BUILD_DIR')
             .with_shell()
             .on_finish(log_run)
             .done()
