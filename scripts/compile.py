@@ -40,14 +40,6 @@ def log_run(cmd, retcode, stdout, stderr):
         raise RuntimeError('Script Failure')
 
 
-def log_ignore_failures(cmd, retcode, stdout, stderr):
-    print 'Comand %s completed with [%d]' % (str(cmd), retcode)
-    print 'STDOUT:'
-    print stdout
-    print 'STDERR:'
-    print stderr
-    
-
 if __name__ == '__main__':
     (Builder()
         .configure()
@@ -59,21 +51,6 @@ if __name__ == '__main__':
             .package('MAVEN')
             .done()
         .run()
-            .command('ls -la')
-            .out_of('CACHE_DIR')
-            .on_finish(log_run)
-            .done()
-        .run()
-            .command('tar zxf repo.tar.gz')
-            .out_of('CACHE_DIR')
-            .on_finish(log_ignore_failures)
-            .done()
-        .run()
-            .command('ls -la')
-            .out_of('CACHE_DIR')
-            .on_finish(log_run)
-            .done()
-        .run()
             .command(maven_command)
             .environment_variable()
                 .name('JAVA_HOME')
@@ -83,18 +60,8 @@ if __name__ == '__main__':
             .on_finish(log_run)
             .done()
         .run()
-            .command('tar czf repo.tar.gz repo/')
-            .out_of('CACHE_DIR')
-            .on_finish(log_run)
-            .done()
-        .run()
             .command(copy_maven_repo_to_droplet)
             .out_of('BUILD_DIR')
-            .done()
-        .run()
-            .command('ls -la')
-            .out_of('CACHE_DIR')
-            .on_finish(log_run)
             .done()
         .create_start_script()
             .environment_variable()
