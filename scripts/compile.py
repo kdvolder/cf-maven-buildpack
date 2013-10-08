@@ -14,6 +14,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import os
 from build_pack_utils import Builder
 
 
@@ -21,6 +22,7 @@ def maven_command(cfg):
     mvnCmd = cfg.get('MAVEN_BUILD_COMMAND', 'package')
     mvn = os.path.join(cfg['BUILD_DIR'], 'bin', 'mvn')
     return [mvn, mvnCmd]
+
 
 def log_run(cmd, retcode, stdout, stderr):
     print 'Comand [%s] failed with [%d]' % (' '.join(cmd), retcode)
