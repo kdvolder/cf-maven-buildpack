@@ -21,14 +21,13 @@ from build_pack_utils import Builder
 def maven_command(cfg):
     mvnCmd = cfg.get('MAVEN_BUILD_COMMAND', 'package')
     mvn = os.path.join(cfg['MAVEN_INSTALL_PATH'], 'bin', 'mvn')
-    mvnRepo = os.path.join(cfg['CACHE_DIR'], 'maven')
-    cfg['MAVEN_LOCAL_REPO'] = mvnRepo
+    mvnRepo = os.path.join(cfg['CACHE_DIR'], 'repo')
     pom = os.path.join(cfg['BUILD_DIR'], 'pom.xml')
     return [mvn, '-Dmaven.repo.local=%s' % mvnRepo, '-f', pom, mvnCmd]
 
 
 def copy_maven_repo_to_droplet(cfg):
-    return ['cp', '-R', cfg['MAVEN_LOCAL_REPO'], '.']
+    return ['cp', '-R', os.path.join(cfg['CACHE_DIR'], 'repo'), '.']
 
 
 def log_run(cmd, retcode, stdout, stderr):
@@ -75,6 +74,7 @@ if __name__ == '__main__':
                 .value('MAVEN_INSTALL_PATH')
             .command()
                 .run('$M2_HOME/bin/mvn')
+                .with_argument('-Dmaven.repo.local=$HOME/repo')
                 .with_argument('tomcat7:run')
                 .done()
             .write())
