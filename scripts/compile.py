@@ -25,6 +25,8 @@ def maven_command(cfg):
 
 
 def log_run(cmd, retcode, stdout, stderr):
+    print 'Current Directory: [%s]' % os.getcwd()
+    print '\n\t'.join(os.listdir(os.getcwd()))
     print 'Comand [%s] failed with [%d]' % (str(cmd), retcode)
     print 'STDOUT:'
     print stdout
