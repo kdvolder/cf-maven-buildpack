@@ -62,6 +62,7 @@ if __name__ == '__main__':
         .run()
             .command(copy_maven_repo_to_droplet)
             .out_of('BUILD_DIR')
+            .on_finish(log_run)
             .done()
         .create_start_script()
             .environment_variable()
