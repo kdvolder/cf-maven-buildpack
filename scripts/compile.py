@@ -18,8 +18,9 @@ from build_pack_utils import Builder
 
 
 def maven_command(cfg):
-    return cfg.get('MAVEN_BUILD_COMMAND', './bin/mvn package').split(' ')
-
+    mvnCmd = cfg.get('MAVEN_BUILD_COMMAND', 'package')
+    mvn = os.path.join(cfg['BUILD_DIR'], 'bin', 'mvn')
+    return [mvn, mvnCmd]
 
 def log_run(cmd, retcode, stdout, stderr):
     print 'Comand [%s] failed with [%d]' % (' '.join(cmd), retcode)
@@ -45,7 +46,6 @@ if __name__ == '__main__':
             .environment_variable()
                 .name('JAVA_HOME')
                 .value('JAVA_INSTALL_PATH')
-            .out_of('MAVEN_INSTALL_PATH')
             .with_shell()
             .on_finish(log_run)
             .done()
