@@ -64,7 +64,7 @@ if __name__ == '__main__':
                 .name('M2_HOME')
                 .value('MAVEN_INSTALL_PATH')
             .command()
-                .run('mvn')
+                .run('$M2_HOME/bin/mvn')
                 .with_argument('tomcat7:run')
                 .done()
             .write())
