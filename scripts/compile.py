@@ -75,6 +75,6 @@ if __name__ == '__main__':
             .command()
                 .run('$M2_HOME/bin/mvn')
                 .with_argument('-Dmaven.repo.local=$HOME/repo')
-                .with_argument('tomcat7:run')
+                .with_argument('MAVEN_RUN_COMMAND')
                 .done()
             .write())
