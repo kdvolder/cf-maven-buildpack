@@ -14,14 +14,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 from build_pack_utils import Builder
-from build_pack_utils import Configurer
 
-ctx = (Builder()
-           .configure()
-               .default_config()
-               .user_config()).builder._ctx
-
-print 'default_process_types:'
-print '  web: %s' % ctx.get('START_SCRIPT_NAME', '$HOME/start.sh')
+(Builder()
+    .configure()
+        .done()
+    .release())
