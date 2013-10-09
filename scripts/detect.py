@@ -14,20 +14,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-import sys
-import os.path
 from build_pack_utils import Builder
-from build_pack_utils import Configurer
 
-ctx = (Builder()
-           .configure()
-               .default_config()
-               .user_config()).builder._ctx
-
-if ctx['BUILD_DIR'] and os.path.exists(os.path.join(ctx['BUILD_DIR'], 'pom.xml')):
-    print 'Maven'
-    sys.exit(0)
-
-print 'no'
-sys.exit(1)
+(Builder()
+     .configure()
+         .done()
+     .detect()
+         .by_name('pom.xml')
+         .if_found_output('Maven')
+         .done())
