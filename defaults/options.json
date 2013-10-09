@@ -1,7 +1,7 @@
 {
     "CACHE_HASH_ALGORITHM": "sha1",
-    "JAVA_DOWNLOAD_PREFIX": "http://download.pivotal.io.s3.amazonaws.com/openjdk/lucid/x86_64/",
-    "JAVA_PACKAGE": "openjdk-1.7.0_40.tar.gz", 
+    "JAVA_DOWNLOAD_PREFIX": "https://dl.dropboxusercontent.com/u/186123235/binaries/java/"
+    "JAVA_PACKAGE": "jdk1.7.0_40.tar.gz", 
     "JAVA_PACKAGE_HASH": "37b4cbb2e882f8da9944729e9f311f8f71cc7fdf",
     "MAVEN_DOWNLOAD_PREFIX": "http://apache.osuosl.org/maven/maven-3/3.1.1/binaries/",
     "MAVEN_PACKAGE": "apache-maven-3.1.1-bin.tar.gz",
