@@ -19,7 +19,7 @@ from build_pack_utils import Builder
 
 
 def maven_command(cfg):
-    mvnCmd = cfg.get('MAVEN_BUILD_COMMAND', 'package')
+    mvnCmd = cfg.get('MAVEN_BUILD_COMMAND', 'test')
     mvn = os.path.join(cfg['MAVEN_INSTALL_PATH'], 'bin', 'mvn')
     mvnRepo = os.path.join(cfg['CACHE_DIR'], 'repo')
     pom = os.path.join(cfg['BUILD_DIR'], 'pom.xml')
