@@ -3,7 +3,7 @@ CloudFoundry Maven Buildpack
 
 A build pack for CloudFoundry that uses Maven.
 
-This is an experimental build pack for CloudFoundry that uses Maven.  This is different from the standard Java build pack which requires you to build your code locally and upload the compiled bits.  With this build pack your source code is uploaded and built in the CloudFoundry staging environment.  After being built, the application staged and will be run by executing a Maven command (like mvn tomcat7:run).
+This is an experimental build pack for CloudFoundry that uses Maven.  This is different from the standard Java build pack which requires you to build your code locally and upload the compiled bits.  With this build pack your source code is uploaded and built in the CloudFoundry staging environment.  After being built, the staged application files will be run by executing a Maven command (like mvn tomcat7:run).
 
 
 Instructions
@@ -12,9 +12,19 @@ Instructions
 Here are the minimal instructions for using this build pack.
 
   1. Create a Java / Maven project
-  2. Build & Test your application locally with Maven
-  3. Run ```cf push --buildpack=https://github.com/dmikusa-pivotal/cf-maven-buildpack.git``` from the root of your project folder.  Alternatively, use "--path" to specify the root of your project.
-  4. Your application should start and be running on CloudFoundry.
+  1. Build & Test your application locally with Maven
+  1. Run ```mvn clean```.
+  1. Run ```cf push --buildpack=https://github.com/dmikusa-pivotal/cf-maven-buildpack.git``` from the root of your project folder.  Alternatively, use "--path" to specify the root of your project.
+  1. Your application should start and be running on CloudFoundry.
+
+
+Examples
+--------
+
+Here are two example projects that work with the Maven build pack.
+
+ 1. [Spring Hello Env](https://github.com/dmikusa-pivotal/spring-hello-env)
+ 1. [Spring MVC Hibernate Template](https://github.com/dmikusa-pivotal/springmvc-hibernate-template)
 
 
 Behind the Scenes
@@ -31,7 +41,7 @@ At this point, the build pack will execute ```mvn test``` which should compile a
 If your Maven command executes successfully, the build pack will wrap up by doing these two steps.
 
   1. Copy the Maven local repository into the droplet.  This is done to speed up the initial execution of your application when your application is run.
-  2. Create a start script that CloudFoundry will call when the droplet is executed.  By default, the start script is simple.  It sets JAVA_HOME, M2_HOME and calls ```mvn tomcat7:run``` to start your application.  You can specify a different command by setting ```MAVEN_RUN_COMMAND``` in your project configuration file.
+  1. Create a start script that CloudFoundry will call when the droplet is executed.  By default, the start script is simple.  It sets JAVA_HOME, M2_HOME and calls ```mvn tomcat7:run``` to start your application.  You can specify a different command by setting ```MAVEN_RUN_COMMAND``` in your project configuration file.
 
 
 Configuration
@@ -43,7 +53,7 @@ In the previous section, I mentioned *project specific configuration*.  Each pro
 Maven Notes
 -----------
 
-The build pack should work with most pom.xml files, with only minor modifications.  Here are the adjustments that need to be made for the default configuration, which uses ```tomcat7:run``` to start your application.
+The build pack should work with most pom.xml files, with only minor modifications.  Here are the adjustments that need to be made for the default configuration, which uses ```tomcat7:run``` to start your application.  This would vary slightly if you are going to use another command to run your application, like ```jetty:run```.  The key take away is that you want to make sure that the container started by Maven is listening on the VCAP_APP_PORT, which is done in step #3 below.
 
   1. In the ```<properties>``` block, add a property ```tomcat.version```.  Set this to the current version of Tomcat.
   
