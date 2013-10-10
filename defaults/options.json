@@ -1,5 +1,7 @@
 {
     "CACHE_HASH_ALGORITHM": "sha1",
+    "DOWNLOAD_METHOD": "custom",
+    "DOWNLOAD_CLASS": "maven_build_pack.CurlCustomDownloader",
     "JAVA_DOWNLOAD_PREFIX": "https://dl.dropboxusercontent.com/u/186123235/binaries/java/",
     "JAVA_PACKAGE": "jdk1.7.0_40.tar.gz", 
     "JAVA_PACKAGE_HASH": "37b4cbb2e882f8da9944729e9f311f8f71cc7fdf",
