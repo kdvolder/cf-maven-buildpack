@@ -1,5 +1,7 @@
 import os
 import sys
+import shutil
+import re
 from subprocess import Popen
 from subprocess import PIPE
 from cloudfoundry import CloudFoundryUtil
@@ -123,8 +125,68 @@ class Installer(object):
             self.package(key)
         return self
 
+    def config(self):
+        return ConfigInstaller(self)
+
     def done(self):
         return self.builder
+
+
+class ConfigInstaller(object):
+    def __init__(self, installer):
+        self._installer = installer
+        self._cfInst = installer._installer
+        self._ctx = installer.builder._ctx
+        self._app_path = None
+        self._bp_path = None
+        self._to_path = None
+        self._all_files = False
+
+    def from_build_pack(self, fromFile):
+        self._bp_path = fromFile
+        return self
+
+    def or_from_build_pack(self, fromFile):
+        self._bp_path = fromFile
+        return self
+
+    def from_application(self, fromFile):
+        self._app_path = fromFile
+        return self
+
+    def to(self, toPath):
+        self._to_path = toPath
+        return self
+
+    def all_files(self):
+        self._all_files = True
+        return self
+
+    def done(self):
+        if (self._bp_path or self._app_path) and self._to_path:
+            if not self._all_files:
+                if self._bp_path:
+                    self._cfInst.install_from_build_pack(self._bp_path,
+                                                         self._to_path)
+                if self._app_path:
+                    self._cfInst.install_from_application(self._app_path,
+                                                          self._to_path)
+            else:
+                if self._bp_path:
+                    root = os.path.join(self._ctx['BP_DIR'], self._bp_path)
+                    for item in os.listdir(root):
+                        fromFile = os.path.join(self._bp_path, item)
+                        toFile = os.path.join(self._to_path, item)
+                        self._cfInst.install_from_build_pack(fromFile, toFile)
+                if self._app_path:
+                    root = os.path.join(self._ctx['BUILD_DIR'], self._app_path)
+                    if os.path.exists(root) and os.path.isdir(root):
+                        for item in os.listdir(root):
+                            fromFile = os.path.join(self._app_path, item)
+                            toFile = os.path.join(self._to_path, item)
+                            self._cfInst.install_from_application(fromFile,
+                                                                  toFile)
+        return self._installer
 
 
 class Runner(object):
@@ -237,6 +299,95 @@ class Executor(object):
         return self.builder
 
 
+class FileUtil(object):
+    def __init__(self, builder, move=False):
+        self._builder = builder
+        self._move = move
+        self._filters = []
+        self._from_path = None
+        self._into_path = None
+
+    def everything(self):
+        self._filters.append((lambda path: True))
+        return self
+
+    def all_files(self):
+        self._filters.append(
+            lambda path: os.path.isfile(path))
+        return self
+
+    def hidden(self):
+        self._filters.append(
+            lambda path: path.startswith('.'))
+        return self
+
+    def not_hidden(self):
+        self._filters.append(
+            lambda path: not path.startswith('.'))
+        return self
+
+    def all_folders(self):
+        self._filters.append(
+            lambda path: os.path.isdir(path))
+        return self
+
+    def where_name_matches(self, pattern):
+        if hasattr(pattern, 'strip'):
+            pattern = re.compile(pattern)
+        self._filters.append(
+            lambda path: (pattern.match(path) is not None))
+        return self
+
+    def under(self, path):
+        if path in self._builder._ctx.keys():
+            self._from_path = self._builder._ctx[path]
+        elif not path.startswith('/'):
+            self._from_path = os.path.join(os.getcwd(), path)
+        else:
+            self._from_path = path
+        return self
+
+    def into(self, path):
+        if path in self._builder._ctx.keys():
+            self._into_path = self._builder._ctx[path]
+        elif not path.startswith('/'):
+            self._into_path = os.path.join(self._from_path, path)
+        else:
+            self._into_path = path
+        return self
+
+    def _copy_or_move(self, src, dest):
+        if os.path.isfile(src):
+            dest_base = os.path.dirname(dest)
+            if not os.path.exists(dest_base):
+                os.makedirs(os.path.dirname(dest))
+        if not self._move:
+            if os.path.isfile(src):
+                shutil.copy(src, dest)
+            else:
+                shutil.copytree(src, dest)
+        else:
+            shutil.move(src, dest)
+
+    def done(self):
+        if self._from_path and self._into_path:
+            if self._from_path == self._into_path:
+                raise ValueError("Source and destination paths "
+                                 "are the same [%s]" % self._from_path)
+            if not os.path.exists(self._from_path):
+                raise ValueError("Source path [%s] does not exist"
+                                 % self._from_path)
+            if os.path.exists(self._into_path):
+                raise ValueError("Destination path [%s] already exists"
+                                 % self._into_path)
+            for item in os.listdir(self._from_path):
+                if all([f(item) for f in self._filters]):
+                    self._copy_or_move(
+                        os.path.join(self._from_path, item),
+                        os.path.join(self._into_path, item))
+        return self._builder
+
+
 class StartScriptBuilder(object):
     def __init__(self, builder):
         self.builder = builder
@@ -340,6 +491,19 @@ class EnvironmentVariableBuilder(object):
         self._name = name
         return self
 
+    def from_context(self, name):
+        builder = self._scriptBuilder.builder
+        if not name in builder._ctx.keys():
+            raise ValueError('[%s] is not in the context' % name)
+        value = builder._ctx[name]
+        value = value.replace(builder._ctx['BUILD_DIR'], '$HOME')
+        line = []
+        if self._export:
+            line.append('export')
+        line.append("%s=%s" % (name, value))
+        self._scriptBuilder.manual(' '.join(line))
+        return self._scriptBuilder
+
     def value(self, value):
         if not self._name:
             raise ValueError('You must specify a name')
@@ -380,6 +544,12 @@ class Builder(object):
 
     def detect(self):
         return Detecter(self)
+
+    def copy(self):
+        return FileUtil(self)
+
+    def move(self):
+        return FileUtil(self, move=True)
 
     def release(self):
         print 'default_process_types:'
