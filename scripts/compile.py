@@ -82,3 +82,4 @@ if __name__ == '__main__':
                 .with_argument('MAVEN_RUN_COMMAND')
                 .done()
             .write())
+    print 'Done!'
