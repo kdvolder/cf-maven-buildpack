@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import os
+import time
 from build_pack_utils import Builder
 
 
@@ -41,6 +42,7 @@ def log_run(cmd, retcode, stdout, stderr):
 
 
 if __name__ == '__main__':
+    start = time.time()
     (Builder()
         .configure()
             .default_config()
@@ -96,4 +98,5 @@ if __name__ == '__main__':
             .with_shell()
             .on_finish(log_run)
             .done())
-    print 'Done!'
+    end = time.time()
+    print 'Ran in %f secs' % (end - start)
