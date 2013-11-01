@@ -68,6 +68,9 @@ if __name__ == '__main__':
             .out_of('BUILD_DIR')
             .done()
         .create_start_script()
+            .command()
+                .run('echo "startup.sh launched..."')
+                .done()
             .environment_variable()
                 .export()
                 .name('JAVA_HOME')
@@ -90,6 +93,7 @@ if __name__ == '__main__':
         .run()
             .command('ls -lth *')
             .out_of('BUILD_DIR')
+            .with_shell()
             .on_finish(log_run)
             .done())
     print 'Done!'
