@@ -41,7 +41,7 @@ def log_run(cmd, retcode, stdout, stderr):
 
 
 if __name__ == '__main__':
-	print "kdvolder: starting compile" 
+    print "kdvolder: starting compile" 
     (Builder()
         .configure()
             .default_config()
