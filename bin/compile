@@ -5,6 +5,13 @@
 #  python script.  However, this is here in case the
 #  build pack needs to do anything to bootstrap the
 #  python scripts, like install Python.
+
+echo "Compile script starting"
+echo "PWD = " `pwd`
+echo "arg1 =" $1
+echo "arg2 =" $2
+ls -la
+
 BP=$(dirname $(dirname $0))
 export PYTHONPATH=$BP/lib
 python $BP/scripts/compile.py $1 $2
