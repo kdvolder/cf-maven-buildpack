@@ -41,6 +41,7 @@ def log_run(cmd, retcode, stdout, stderr):
 
 
 if __name__ == '__main__':
+	print "kdvolder: starting compile" 
     (Builder()
         .configure()
             .default_config()
@@ -82,3 +83,5 @@ if __name__ == '__main__':
                 .with_argument('MAVEN_RUN_COMMAND')
                 .done()
             .write())
+    print "kdvolder: compile finished" 
+

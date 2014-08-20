@@ -405,8 +405,10 @@ class StartScriptBuilder(object):
     def write(self):
         scriptName = self.builder._ctx.get('START_SCRIPT_NAME',
                                            'start.sh')
+        print "Writing script: ", scriptName
         startScriptPath = os.path.join(
             self.builder._ctx['BUILD_DIR'], scriptName)
+        print "startScriptPath = ", startScriptPath
         with open(startScriptPath, 'wt') as out:
             out.write('\n'.join(self.content))
         os.chmod(startScriptPath, 0755)
