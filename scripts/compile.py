@@ -51,7 +51,7 @@ if __name__ == '__main__':
             .package('MAVEN')
             .done()
         .run()
-            .command('rm java/src.zip')
+            .command('rm -fr java/src.zip')
             .out_of('BUILD_DIR')
             .done()
         .run()
