@@ -11,6 +11,6 @@
     "MAVEN_PACKAGE": "apache-maven-3.1.1-bin.tar.gz",
     "MAVEN_PACKAGE_HASH": "630eea2107b0742acb315b214009ba08602dda5f",
     "MAVEN_STRIP": true,
-    "MAVEN_BUILD_COMMAND": "test",
+    "MAVEN_BUILD_COMMAND": "clean package",
     "MAVEN_RUN_COMMAND": "spring-boot:run"
 }
